@@ -55,8 +55,8 @@ dependencies {
 
     implementation ("androidx.activity:activity-compose:1.8.0")
     implementation ("com.google.accompanist:accompanist-permissions:0.32.0")
-    implementation ("io.coil-kt:coil-compose:2.4.0")
     implementation ("androidx.activity:activity-compose:1.8.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
 
     testImplementation(libs.junit)

@@ -54,6 +54,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import coil.compose.AsyncImage
+
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -140,12 +142,13 @@ fun MyAppNavigation() {
                 navController = navController
             )
         }
+        composable("banktransfer") { BankTransferScreen(navController) } // Added Bank Transfer Screen
         composable("aboutus") { AboutUsScreen(navController) }
         composable("profile") { ProfileScreen(navController) }
         composable("contactus") { ContactUsScreen(navController) }
         composable("reviews") { ReviewsScreen() }
         composable("stkpush") { STKPushPage() }
-        composable("visapayment") { VisaPaymentPage(navController) } // Pass navController here
+        composable("visapayment") { VisaPaymentPage(navController) }
         composable("mastercardpayment") { MastercardPaymentPage(navController) }
         composable("signoutconfirmation") {
             PageImage(
@@ -164,9 +167,10 @@ fun MyAppNavigation() {
         composable("editprofile") { EditProfileScreen(navController) }
         composable("trackorder") { OrderTrackingScreen(navController, currentStep = 1) }
         composable("paymentplan") { PaymentPlanPage(navController) }
-        composable("confirmation") { ConfirmationPage(navController) } // Add confirmation page route
+        composable("confirmation") { ConfirmationPage(navController) }
     }
 }
+
 @Composable
 fun TeazerPage(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -693,17 +697,16 @@ fun LogInImagePreview() {
 @Composable
 fun PaymentOptionsScreen(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit, // Back navigation
-    navController: NavController // Add this parameter
+    onBackClick: () -> Unit,
+    navController: NavController
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Background Image with Overlay
         Image(
-            painter = painterResource(id = R.drawable.payment), // Replace with your background image
+            painter = painterResource(id = R.drawable.payment),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -719,12 +722,11 @@ fun PaymentOptionsScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Back Button and Title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(top = 16.dp, bottom = 32.dp)
             ) {
-                IconButton(onClick = onBackClick) { // Use the onBackClick parameter
+                IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
@@ -740,43 +742,48 @@ fun PaymentOptionsScreen(
                 )
             }
 
-            // Payment Options
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 PaymentOptionButton(
                     name = "Mpesa",
                     logoResId = R.drawable.mpesa_logo,
-                    onClick = { navController.navigate("stkpush") } // Navigate to STKPushPage
+                    onClick = { navController.navigate("stkpush") }
                 )
                 PaymentOptionButton(
                     name = "VISA",
                     logoResId = R.drawable.visa_logo,
-                    onClick = { navController.navigate("visapayment") } // Navigate to VisaPaymentPage
+                    onClick = { navController.navigate("visapayment") }
                 )
                 PaymentOptionButton(
                     name = "G Pay",
                     logoResId = R.drawable.gpay_logo,
-                    onClick = { /* Handle G Pay payment */ } // Placeholder for G Pay
+                    onClick = { /* Handle G Pay payment */ }
                 )
                 PaymentOptionButton(
                     name = "Mastercard",
                     logoResId = R.drawable.mastercard_logo,
-                    onClick = { navController.navigate("mastercardpayment") } // Navigate to MastercardPaymentPage
+                    onClick = { navController.navigate("mastercardpayment") }
                 )
-                AddPaymentMethodButton()
+                PaymentOptionButton(
+                    name = "Bank Transfer",
+                    logoResId = R.drawable.bank_transfer, // Add bank transfer logo
+                    onClick = { navController.navigate("banktransfer") }
+                )
+
             }
         }
     }
 }
+
 @Composable
 fun PaymentOptionButton(
     name: String,
     logoResId: Int,
-    onClick: () -> Unit // Add this parameter
+    onClick: () -> Unit
 ) {
     Button(
-        onClick = onClick, // Use the onClick parameter
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
@@ -802,35 +809,7 @@ fun PaymentOptionButton(
         }
     }
 }
-@Composable
-fun AddPaymentMethodButton() {
-    OutlinedButton(
-        onClick = { /* Handle add payment method */ },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-        shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(1.dp, Color.Gray),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Payment Method",
-                tint = Color.Gray
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Add Payment Method",
-                color = Color.Gray,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Normal
-            )
-        }
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -2253,7 +2232,7 @@ fun ContactUsScreenPreview() {
 @Composable
 fun ProfileScreen(navController: NavController) {
     Box(
-        modifier = Modifier,
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
         Column(
@@ -2268,35 +2247,27 @@ fun ProfileScreen(navController: NavController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(modifier = Modifier.align(Alignment.Start)) {
-                IconButton(onClick = { navController.popBackStack() }) { // Navigate back
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-            }
+            // Back Button
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Profile",
                     color = Color(0xFFFFA500),
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
+                    fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.weight(1.5f))
             }
             Spacer(modifier = Modifier.height(16.dp))
 
             // Profile Image with Edit Icon
-            Box(
-                contentAlignment = Alignment.BottomEnd
-            ) {
+            Box(contentAlignment = Alignment.BottomEnd) {
                 Image(
                     painter = painterResource(id = R.drawable.profile_pic),
                     contentDescription = "Profile Image",
@@ -2305,20 +2276,13 @@ fun ProfileScreen(navController: NavController) {
                         .clip(CircleShape)
                 )
                 IconButton(
-                    onClick = {
-                        // Navigate to the Edit Profile Screen
-                        navController.navigate("editprofile")
-                    },
+                    onClick = { navController.navigate("editprofile") },
                     modifier = Modifier
                         .size(32.dp)
                         .background(Color.White, CircleShape)
                         .border(1.dp, Color.Gray, CircleShape)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Create,
-                        contentDescription = "Edit Profile",
-                        tint = Color.Black
-                    )
+                    Icon(imageVector = Icons.Default.Create, contentDescription = "Edit Profile", tint = Color.Black)
                 }
             }
 
@@ -2329,49 +2293,82 @@ fun ProfileScreen(navController: NavController) {
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            BasicTextField(
-                value = TextFieldValue("40000000"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            BasicTextField(
-                value = TextFieldValue("1-5-2000"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            BasicTextField(
-                value = TextFieldValue("+254748000000"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            BasicTextField(
-                value = TextFieldValue("Nairobi"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Profile Details Card
+            Card(
+                modifier = Modifier.fillMaxWidth(0.9f),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.3f)), // FIXED
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp) // FIXED
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // ID Number
+                    Column {
+                        Text(text = "ID Number", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        BasicTextField(
+                            value = TextFieldValue("40000000"),
+                            onValueChange = {},
+                            textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
+                                .padding(8.dp)
+                        )
+                    }
+
+                    // Date of Birth
+                    Column {
+                        Text(text = "Date of Birth", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        BasicTextField(
+                            value = TextFieldValue("1-5-2000"),
+                            onValueChange = {},
+                            textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
+                                .padding(8.dp)
+                        )
+                    }
+
+                    // Phone Number
+                    Column {
+                        Text(text = "Phone Number", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        BasicTextField(
+                            value = TextFieldValue("+254748000000"),
+                            onValueChange = {},
+                            textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
+                                .padding(8.dp)
+                        )
+                    }
+
+                    // Location
+                    Column {
+                        Text(text = "Location", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        BasicTextField(
+                            value = TextFieldValue("Nairobi"),
+                            onValueChange = {},
+                            textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
+
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPeview() {
@@ -2379,16 +2376,14 @@ fun ProfileScreenPeview() {
     ProfileScreen(navController = navController)
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(navController: NavController) {
-    // State to hold the selected image URI
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Launcher for picking images from the gallery
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri // Update the state with the selected image URI
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        imageUri = uri
     }
 
     Box(
@@ -2403,42 +2398,58 @@ fun EditProfileScreen(navController: NavController) {
             .padding(16.dp),
         contentAlignment = Alignment.TopCenter
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Back button
-            Box(modifier = Modifier.align(Alignment.Start)) {
-                IconButton(onClick = { navController.popBackStack() }) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Back Arrow (Now properly aligned to the left)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                ) {
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = "Back",
                         tint = Color.White
                     )
                 }
-            }
 
-            // Title
-            Text(
-                text = "Edit Profile",
-                color = Color(0xFFFFA500),
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Start
-            )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Edit Profile",
+                    color = Color(0xFFFFA500),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center, // Centers text
+                    modifier = Modifier
+                        .fillMaxWidth() // Makes the text take full width
+                        .padding(top = 16.dp) // Optional padding for better positioning
+                )
+
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Profile photo section
+            // Profile Image Selection
             Box(
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(Color.Gray)
-                    .clickable { launcher.launch("image/*") } // Open image picker
+                    .clickable { launcher.launch("image/*") }
             ) {
-                // Display the selected image or the default profile photo
                 if (imageUri != null) {
-                    Image(
-                        painter = rememberImagePainter(data = imageUri),
+                    AsyncImage(
+                        model = imageUri,
                         contentDescription = "Profile Image",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(120.dp)
                             .clip(CircleShape)
@@ -2453,7 +2464,6 @@ fun EditProfileScreen(navController: NavController) {
                     )
                 }
 
-                // Add photo icon
                 Image(
                     painter = painterResource(id = R.drawable.add_photos),
                     contentDescription = "Change Profile Photo",
@@ -2464,84 +2474,99 @@ fun EditProfileScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Change Profile Photo",
-                color = Color(0xFFE0E0E0),
-                fontSize = 16.sp
+            Text(text = "Change Profile Photo", color = Color(0xFFE0E0E0), fontSize = 16.sp)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Form Fields
+            val textFieldModifier = Modifier
+                .fillMaxWidth(0.9f)
+                .background(Color.Transparent)
+
+            val textFieldColors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color(0xFFFFA500),
+                unfocusedIndicatorColor = Color.Gray,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                cursorColor = Color.White,
+                disabledTextColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
             )
 
-            // Rest of the form fields
+
+            OutlinedTextField(
+                value = "First Name",
+                onValueChange = {},
+                label = { Text("First Name", color = Color.White) },
+                colors = textFieldColors,
+                modifier = textFieldModifier
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = "Last Name",
+                onValueChange = {},
+                label = { Text("Last Name", color = Color.White) },
+                colors = textFieldColors,
+                modifier = textFieldModifier
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = "Date of Birth",
+                onValueChange = {},
+                label = { Text("Date of Birth", color = Color.White) },
+                colors = textFieldColors,
+                modifier = textFieldModifier
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = "Identification Number",
+                onValueChange = {},
+                label = { Text("Identification Number", color = Color.White) },
+                colors = textFieldColors,
+                modifier = textFieldModifier
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = "Phone Number",
+                onValueChange = {},
+                label = { Text("Phone Number", color = Color.White) },
+                colors = textFieldColors,
+                modifier = textFieldModifier
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = "Location",
+                onValueChange = {},
+                label = { Text("Location", color = Color.White) },
+                colors = textFieldColors,
+                modifier = textFieldModifier
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
-            BasicTextField(
-                value = TextFieldValue("First Name"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            BasicTextField(
-                value = TextFieldValue("Last Name"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            BasicTextField(
-                value = TextFieldValue("Date of Birth"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            BasicTextField(
-                value = TextFieldValue("Identification Number"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            BasicTextField(
-                value = TextFieldValue("Phone Number"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            BasicTextField(
-                value = TextFieldValue("Location"),
-                onValueChange = {},
-                textStyle = TextStyle(color = Color(0xFFE0E0E0), fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = {},
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
-                Text("Save Changes", color = Color(0xFFE0E0E0), fontSize = 16.sp)
+                Text("Save Changes", color = Color.White, fontSize = 16.sp)
             }
         }
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -2980,3 +3005,58 @@ fun ChangePasswordScreenPreview() {
     ChangePasswordScreen(navController = navController)
 }
 
+
+
+
+
+
+
+@Composable
+fun BankTransferScreen(navController: NavController) {
+Column(modifier = Modifier
+    .background(
+        brush = Brush.verticalGradient(
+            colors = listOf(Color(0xFF162F44), Color.Gray),
+            tileMode = TileMode.Clamp,
+        )
+    )
+){
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            ,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+
+    ) {
+        Text(
+            text = "Bank Transfer Details",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Bank Name: ABC Bank")
+        Text(text = "Account Number: 1234567890")
+        Text(text = "Branch: Nairobi")
+        Text(text = "Swift Code: ABCDEF123")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { navController.popBackStack() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00))
+        ) {
+            Text("Back to Payment Options")
+        }
+    }
+}
+}
+
+@Preview( showBackground = true)
+@Composable
+fun BankTransferScreenPreview(){
+    val navController = rememberNavController()
+    BankTransferScreen(navController = navController)
+}
