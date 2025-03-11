@@ -94,6 +94,8 @@ import coil.compose.rememberImagePainter
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.AlertDialog
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -142,12 +144,11 @@ fun MyAppNavigation() {
                 navController = navController
             )
         }
-        composable("banktransfer") { BankTransferScreen(navController) } // Added Bank Transfer Screen
+        composable("banktransfer") { BankTransferScreen(navController) }
         composable("aboutus") { AboutUsScreen(navController) }
         composable("profile") { ProfileScreen(navController) }
         composable("contactus") { ContactUsScreen(navController) }
         composable("reviews") { ReviewsScreen() }
-        composable("stkpush") { STKPushPage() }
         composable("visapayment") { VisaPaymentPage(navController) }
         composable("mastercardpayment") { MastercardPaymentPage(navController) }
         composable("signoutconfirmation") {
@@ -170,6 +171,7 @@ fun MyAppNavigation() {
         composable("confirmation") { ConfirmationPage(navController) }
     }
 }
+
 
 @Composable
 fun TeazerPage(navController: NavController) {
@@ -746,11 +748,6 @@ fun PaymentOptionsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 PaymentOptionButton(
-                    name = "Mpesa",
-                    logoResId = R.drawable.mpesa_logo,
-                    onClick = { navController.navigate("stkpush") }
-                )
-                PaymentOptionButton(
                     name = "VISA",
                     logoResId = R.drawable.visa_logo,
                     onClick = { navController.navigate("visapayment") }
@@ -767,14 +764,14 @@ fun PaymentOptionsScreen(
                 )
                 PaymentOptionButton(
                     name = "Bank Transfer",
-                    logoResId = R.drawable.bank_transfer, // Add bank transfer logo
+                    logoResId = R.drawable.bank_transfer, // Bank transfer logo
                     onClick = { navController.navigate("banktransfer") }
                 )
-
             }
         }
     }
 }
+
 
 @Composable
 fun PaymentOptionButton(
@@ -1249,70 +1246,7 @@ fun CarDetailScreen(
         }
     }
 }
-@Composable
-fun STKPushPage(onSendClick: () -> Unit = {}) {
-    var pin by remember { mutableStateOf("") }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFF162F44), Color.Gray),
-                tileMode = TileMode.Clamp,
-            )),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .padding(16.dp)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text ="Do you wish to pay  Ksh 4,746,377 to Wamunyoro Importers Limited? A transaction charge of Ksh 1500 will be applied. "
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Enter M-Pesa PIN",
-                    color = Color.Black
-                )
-                OutlinedTextField(
-                    value = pin,
-                    onValueChange = { pin = it },
-                    label = { Text("PIN") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-
-
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Row {
-                    Button(onClick = { /* Cancel Action */ }) {
-                        Text(text = "Cancel")
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = onSendClick,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00))
-                    ) {
-                        Text(text = "Send", color = Color.Black)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSTKPushPage() {
-    STKPushPage()
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 
@@ -2402,7 +2336,7 @@ fun EditProfileScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Back Arrow (Now properly aligned to the left)
+            // Back Arrow and Title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -2427,50 +2361,64 @@ fun EditProfileScreen(navController: NavController) {
                     color = Color(0xFFFFA500),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center, // Centers text
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth() // Makes the text take full width
-                        .padding(top = 16.dp) // Optional padding for better positioning
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
                 )
-
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Profile Image Selection
+            // Profile Image with Add Photo Icon Outside
             Box(
+                contentAlignment = Alignment.BottomEnd,
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(Color.Gray)
-                    .clickable { launcher.launch("image/*") }
+                    .size(130.dp) // Slightly larger to accommodate the icon
             ) {
-                if (imageUri != null) {
-                    AsyncImage(
-                        model = imageUri,
-                        contentDescription = "Profile Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile_user),
-                        contentDescription = "Default Profile Image",
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                    )
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(Color.Gray)
+                        .clickable { launcher.launch("image/*") }
+                ) {
+                    if (imageUri != null) {
+                        AsyncImage(
+                            model = imageUri,
+                            contentDescription = "Profile Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(CircleShape)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.profile_user),
+                            contentDescription = "Default Profile Image",
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(CircleShape)
+                        )
+                    }
                 }
 
-                Image(
-                    painter = painterResource(id = R.drawable.add_photos),
-                    contentDescription = "Change Profile Photo",
+                // Add Photo Icon placed slightly outside the profile image
+                IconButton(
+                    onClick = { launcher.launch("image/*") },
                     modifier = Modifier
-                        .size(50.dp)
-                        .align(Alignment.BottomEnd)
-                )
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFFFA500))
+                        .border(2.dp, Color.White, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "Change Profile Photo",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -2493,7 +2441,6 @@ fun EditProfileScreen(navController: NavController) {
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White
             )
-
 
             OutlinedTextField(
                 value = "First Name",
@@ -2565,6 +2512,32 @@ fun EditProfileScreen(navController: NavController) {
         }
     }
 }
+
+
+@Composable
+fun ProfileTextField(label: String, value: String, onValueChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color.White) },
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color(0xFFFFA500),
+            unfocusedIndicatorColor = Color.Gray,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            cursorColor = Color.White,
+            disabledTextColor = Color.White,
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
+        ),
+        modifier = Modifier
+            .fillMaxWidth(0.9f)
+            .background(Color.Transparent)
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+}
+
 
 
 
@@ -3013,46 +2986,110 @@ fun ChangePasswordScreenPreview() {
 
 @Composable
 fun BankTransferScreen(navController: NavController) {
-Column(modifier = Modifier
-    .background(
-        brush = Brush.verticalGradient(
-            colors = listOf(Color(0xFF162F44), Color.Gray),
-            tileMode = TileMode.Clamp,
-        )
-    )
-){
+    var amount by remember { mutableStateOf("") }
+    var referenceNumber by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            ,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF162F44), Color.Gray),
+                    tileMode = TileMode.Clamp,
+                )
+            )
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Bank Transfer Details",
-            fontSize = 24.sp,
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.White,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Bank Name: ABC Bank")
-        Text(text = "Account Number: 1234567890")
-        Text(text = "Branch: Nairobi")
-        Text(text = "Swift Code: ABCDEF123")
-        Spacer(modifier = Modifier.height(16.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Bank Name: ABC Bank", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                Text(text = "Account Number: 1234567890", fontSize = 18.sp)
+                Text(text = "Branch: Nairobi", fontSize = 18.sp)
+                Text(text = "Swift Code: ABCDEF123", fontSize = 18.sp)
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+
+        OutlinedTextField(
+            value = amount,
+            onValueChange = { amount = it },
+            label = { Text("Enter Amount") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = referenceNumber,
+            onValueChange = { referenceNumber = it },
+            label = { Text("Reference Number") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = notes,
+            onValueChange = { notes = it },
+            label = { Text("Additional Notes (Optional)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(
-            onClick = { navController.popBackStack() },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00))
+            onClick = { showDialog = true },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00)),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Back to Payment Options")
+            Text("Confirm Transfer", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        TextButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Back to Payment Options", color = Color.White)
+        }
+
+        // Confirmation Dialog
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showDialog = false
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                title = { Text("Transfer Initiated") },
+                text = { Text("Please complete the bank transfer using the provided details.") }
+            )
         }
     }
 }
-}
+
 
 @Preview( showBackground = true)
 @Composable
