@@ -148,7 +148,7 @@ fun MyAppNavigation() {
         composable("aboutus") { AboutUsScreen(navController) }
         composable("profile") { ProfileScreen(navController) }
         composable("contactus") { ContactUsScreen(navController) }
-        composable("reviews") { ReviewsScreen() }
+        composable("reviews") { ReviewsScreen(navController) }
         composable("visapayment") { VisaPaymentPage(navController) }
         composable("mastercardpayment") { MastercardPaymentPage(navController) }
         composable("signoutconfirmation") {
@@ -1249,7 +1249,6 @@ fun CarDetailScreen(
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun VisaPaymentPage(
     navController: NavController,
@@ -1264,141 +1263,168 @@ fun VisaPaymentPage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFF162F44), Color.Gray),
-                tileMode = TileMode.Clamp,
-            )),
-        contentAlignment = Alignment.Center
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF162F44), Color.Gray),
+                    tileMode = TileMode.Clamp,
+                )
+            )
     ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .padding(16.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(16.dp)
+            // Back Button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Visa Logo
-                Image(
-                    painter = painterResource(id = R.drawable.visa),
-                    contentDescription = "VISA Logo",
-                    modifier = Modifier
-                        .height(100.dp)
-                        .padding(bottom = 16.dp)
-                        .fillMaxWidth()
-                )
-
-                // Card Number Field
-                OutlinedTextField(
-                    value = cardNumber,
-                    onValueChange = { cardNumber = it },
-                    label = { Text("Card Number", color = Color.White) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        unfocusedLabelColor = Color.White,
-                        focusedLabelColor = Color(0xFF0A1A2E),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color(0xFF0A1A2E),
-                        cursorColor = Color.White
-                    ),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    singleLine = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Expiry Date Fields
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    OutlinedTextField(
-                        value = expiryMonth,
-                        onValueChange = { expiryMonth = it },
-                        label = { Text("Month", color = Color.White) },
-                        modifier = Modifier.weight(1f),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            unfocusedLabelColor = Color.White,
-                            focusedLabelColor = Color(0xFF0A1A2E),
-                            unfocusedBorderColor = Color.Gray,
-                            focusedBorderColor = Color(0xFF0A1A2E),
-                            cursorColor = Color.White
-                        ),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        singleLine = true
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedTextField(
-                        value = expiryYear,
-                        onValueChange = { expiryYear = it },
-                        label = { Text("Year", color = Color.White) },
-                        modifier = Modifier.weight(1f),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            unfocusedLabelColor = Color.White,
-                            focusedLabelColor = Color(0xFF0A1A2E),
-                            unfocusedBorderColor = Color.Gray,
-                            focusedBorderColor = Color(0xFF0A1A2E),
-                            cursorColor = Color.White
-                        ),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        singleLine = true
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
                     )
                 }
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // CVC Field
-                OutlinedTextField(
-                    value = cvc,
-                    onValueChange = { cvc = it },
-                    label = { Text("CVC", color = Color.White) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        unfocusedLabelColor = Color.White,
-                        focusedLabelColor = Color(0xFF0A1A2E),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color(0xFF0A1A2E),
-                        cursorColor = Color.White
-                    ),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    singleLine = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Card Holder's Name Field
-                OutlinedTextField(
-                    value = cardHolder,
-                    onValueChange = { cardHolder = it },
-                    label = { Text("Card Holder's Name", color = Color.White) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        unfocusedLabelColor = Color.White,
-                        focusedLabelColor = Color(0xFF0A1A2E),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedBorderColor = Color(0xFF0A1A2E),
-                        cursorColor = Color.White
-                    ),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                    singleLine = true
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Complete Order Button
-                Button(
-                    onClick = {
-                        onCompleteClick()
-                        navController.navigate("confirmation") // Navigate to confirmation page
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00)),
-                    modifier = Modifier.fillMaxWidth()
+            // Payment Form
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+                    modifier = Modifier
+                        .fillMaxWidth(0.85f)
+                        .padding(16.dp)
                 ) {
-                    Text(text = "COMPLETE ORDER KSH 4,746,377", color = Color.White)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        // Visa Logo
+                        Image(
+                            painter = painterResource(id = R.drawable.visa),
+                            contentDescription = "VISA Logo",
+                            modifier = Modifier
+                                .height(100.dp)
+                                .padding(bottom = 16.dp)
+                                .fillMaxWidth()
+                        )
+
+                        // Card Number Field
+                        OutlinedTextField(
+                            value = cardNumber,
+                            onValueChange = { cardNumber = it },
+                            label = { Text("Card Number", color = Color.White) },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedLabelColor = Color.White,
+                                focusedLabelColor = Color(0xFF0A1A2E),
+                                unfocusedBorderColor = Color.Gray,
+                                focusedBorderColor = Color(0xFF0A1A2E),
+                                cursorColor = Color.White
+                            ),
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            singleLine = true
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Expiry Date Fields
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            OutlinedTextField(
+                                value = expiryMonth,
+                                onValueChange = { expiryMonth = it },
+                                label = { Text("Month", color = Color.White) },
+                                modifier = Modifier.weight(1f),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    unfocusedLabelColor = Color.White,
+                                    focusedLabelColor = Color(0xFF0A1A2E),
+                                    unfocusedBorderColor = Color.Gray,
+                                    focusedBorderColor = Color(0xFF0A1A2E),
+                                    cursorColor = Color.White
+                                ),
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                singleLine = true
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            OutlinedTextField(
+                                value = expiryYear,
+                                onValueChange = { expiryYear = it },
+                                label = { Text("Year", color = Color.White) },
+                                modifier = Modifier.weight(1f),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    unfocusedLabelColor = Color.White,
+                                    focusedLabelColor = Color(0xFF0A1A2E),
+                                    unfocusedBorderColor = Color.Gray,
+                                    focusedBorderColor = Color(0xFF0A1A2E),
+                                    cursorColor = Color.White
+                                ),
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                singleLine = true
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // CVC Field
+                        OutlinedTextField(
+                            value = cvc,
+                            onValueChange = { cvc = it },
+                            label = { Text("CVC", color = Color.White) },
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedLabelColor = Color.White,
+                                focusedLabelColor = Color(0xFF0A1A2E),
+                                unfocusedBorderColor = Color.Gray,
+                                focusedBorderColor = Color(0xFF0A1A2E),
+                                cursorColor = Color.White
+                            ),
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            singleLine = true
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Card Holder's Name Field
+                        OutlinedTextField(
+                            value = cardHolder,
+                            onValueChange = { cardHolder = it },
+                            label = { Text("Card Holder's Name", color = Color.White) },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedLabelColor = Color.White,
+                                focusedLabelColor = Color(0xFF0A1A2E),
+                                unfocusedBorderColor = Color.Gray,
+                                focusedBorderColor = Color(0xFF0A1A2E),
+                                cursorColor = Color.White
+                            ),
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                            singleLine = true
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Complete Order Button
+                        Button(
+                            onClick = {
+                                onCompleteClick()
+                                navController.navigate("confirmation") // Navigate to confirmation page
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "COMPLETE ORDER KSH 4,746,377", color = Color.White)
+                        }
+                    }
                 }
             }
         }
@@ -1668,12 +1694,13 @@ fun AboutUsScreenPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewsScreen() {
+fun ReviewsScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.6f))
     ) {
+        // Background Image
         Image(
             painter = painterResource(id = R.drawable.vw_logo),
             contentDescription = "Background Image",
@@ -1681,6 +1708,22 @@ fun ReviewsScreen() {
             modifier = Modifier.fillMaxSize()
         )
 
+        // Back Arrow (White) at the Top Left
+        IconButton(
+            onClick = { navController.popBackStack() }, // Navigates back
+            modifier = Modifier
+                .padding(16.dp)
+                .size(32.dp)
+                .align(Alignment.TopStart) // Position at the top left
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.White // White arrow
+            )
+        }
+
+        // Review Card
         Card(
             modifier = Modifier
                 .height(600.dp)
@@ -1702,8 +1745,12 @@ fun ReviewsScreen() {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Star Rating Bar
                 StarRatingBar()
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Comment Box
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
@@ -1719,7 +1766,10 @@ fun ReviewsScreen() {
                         containerColor = Color.DarkGray,
                     )
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Submit Button
                 Button(
                     onClick = { /* Submit Action */ },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA726))
@@ -1730,6 +1780,7 @@ fun ReviewsScreen() {
         }
     }
 }
+
 @Composable
 fun StarRatingBar() {
     var rating by remember { mutableStateOf(0) }
@@ -1750,7 +1801,8 @@ fun StarRatingBar() {
 @Preview(showBackground = true)
 @Composable
 fun ReviewsScreenPreview() {
-    ReviewsScreen()
+    val navController = rememberNavController()
+    ReviewsScreen(navController= navController)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -2622,7 +2674,7 @@ fun PaymentPlanPagePreview() {
 @OptIn(ExperimentalMaterial3Api::class) // For experimental APIs
 @Composable
 fun MastercardPaymentPage(
-    navController: NavController, // Add NavController parameter
+    navController: NavController,
     onCompleteClick: () -> Unit = {}
 ) {
     var cardNumber by remember { mutableStateOf("") }
@@ -2637,7 +2689,7 @@ fun MastercardPaymentPage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black), // Fallback background color
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
         // Background Image
@@ -2645,13 +2697,28 @@ fun MastercardPaymentPage(
             painter = backgroundImage,
             contentDescription = "Background Image",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop // Adjust the image scaling
+            contentScale = ContentScale.Crop
         )
 
-        // Payment Card
+        // Back Arrow (White)
+        IconButton(
+            onClick = { navController.popBackStack() }, // Navigates back
+            modifier = Modifier
+                .padding(16.dp)
+                .size(32.dp)
+                .align(Alignment.TopStart) // Position at the top left
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.White // White arrow
+            )
+        }
+
+        // Payment Card UI (Remains the same)
         Card(
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.8f)), // Semi-transparent dark gray
+            colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.8f)),
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .padding(16.dp)
@@ -2662,7 +2729,7 @@ fun MastercardPaymentPage(
             ) {
                 // Mastercard Logo
                 Image(
-                    painter = painterResource(id = R.drawable.mastercard_logo), // Replace with your Mastercard logo resource
+                    painter = painterResource(id = R.drawable.mastercard_logo),
                     contentDescription = "Mastercard Logo",
                     modifier = Modifier
                         .height(50.dp)
@@ -2673,17 +2740,16 @@ fun MastercardPaymentPage(
                 OutlinedTextField(
                     value = cardNumber,
                     onValueChange = { cardNumber = it },
-                    label = { Text("Card Number", color = Color.White) }, // White placeholder text
+                    label = { Text("Card Number", color = Color.White) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedLabelColor = Color(0xFFEB001B), // Mastercard red for focused placeholder
-                        unfocusedLabelColor = Color.White, // White placeholder when unfocused
-                        focusedBorderColor = Color(0xFFEB001B), // Mastercard red for focused border
-                        unfocusedBorderColor = Color.Gray, // Gray border when unfocused
-                        cursorColor = Color.White // White cursor
+                        focusedLabelColor = Color(0xFFEB001B),
+                        unfocusedLabelColor = Color.White,
+                        focusedBorderColor = Color(0xFFEB001B),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color.White
                     ),
-                    textStyle = TextStyle(color = Color.White), // White text color
-                    placeholder = { Text("Card Number", color = Color.White) } // White placeholder text
+                    textStyle = TextStyle(color = Color.White)
                 )
 
                 // Expiry Date Fields
@@ -2694,33 +2760,31 @@ fun MastercardPaymentPage(
                     OutlinedTextField(
                         value = expiryMonth,
                         onValueChange = { expiryMonth = it },
-                        label = { Text("Month", color = Color.White) }, // White placeholder text
+                        label = { Text("Month", color = Color.White) },
                         modifier = Modifier.weight(1f),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedLabelColor = Color(0xFFEB001B), // Mastercard red for focused placeholder
-                            unfocusedLabelColor = Color.White, // White placeholder when unfocused
-                            focusedBorderColor = Color(0xFFEB001B), // Mastercard red for focused border
-                            unfocusedBorderColor = Color.Gray, // Gray border when unfocused
-                            cursorColor = Color.White // White cursor
+                            focusedLabelColor = Color(0xFFEB001B),
+                            unfocusedLabelColor = Color.White,
+                            focusedBorderColor = Color(0xFFEB001B),
+                            unfocusedBorderColor = Color.Gray,
+                            cursorColor = Color.White
                         ),
-                        textStyle = TextStyle(color = Color.White), // White text color
-                        placeholder = { Text("MM", color = Color.White) } // White placeholder text
+                        textStyle = TextStyle(color = Color.White)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedTextField(
                         value = expiryYear,
                         onValueChange = { expiryYear = it },
-                        label = { Text("Year", color = Color.White) }, // White placeholder text
+                        label = { Text("Year", color = Color.White) },
                         modifier = Modifier.weight(1f),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedLabelColor = Color(0xFFEB001B), // Mastercard red for focused placeholder
-                            unfocusedLabelColor = Color.White, // White placeholder when unfocused
-                            focusedBorderColor = Color(0xFFEB001B), // Mastercard red for focused border
-                            unfocusedBorderColor = Color.Gray, // Gray border when unfocused
-                            cursorColor = Color.White // White cursor
+                            focusedLabelColor = Color(0xFFEB001B),
+                            unfocusedLabelColor = Color.White,
+                            focusedBorderColor = Color(0xFFEB001B),
+                            unfocusedBorderColor = Color.Gray,
+                            cursorColor = Color.White
                         ),
-                        textStyle = TextStyle(color = Color.White), // White text color
-                        placeholder = { Text("YY", color = Color.White) } // White placeholder text
+                        textStyle = TextStyle(color = Color.White)
                     )
                 }
 
@@ -2728,35 +2792,33 @@ fun MastercardPaymentPage(
                 OutlinedTextField(
                     value = cvc,
                     onValueChange = { cvc = it },
-                    label = { Text("CVC", color = Color.White) }, // White placeholder text
+                    label = { Text("CVC", color = Color.White) },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedLabelColor = Color(0xFFEB001B), // Mastercard red for focused placeholder
-                        unfocusedLabelColor = Color.White, // White placeholder when unfocused
-                        focusedBorderColor = Color(0xFFEB001B), // Mastercard red for focused border
-                        unfocusedBorderColor = Color.Gray, // Gray border when unfocused
-                        cursorColor = Color.White // White cursor
+                        focusedLabelColor = Color(0xFFEB001B),
+                        unfocusedLabelColor = Color.White,
+                        focusedBorderColor = Color(0xFFEB001B),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color.White
                     ),
-                    textStyle = TextStyle(color = Color.White), // White text color
-                    placeholder = { Text("CVC", color = Color.White) } // White placeholder text
+                    textStyle = TextStyle(color = Color.White)
                 )
 
                 // Card Holder's Name Field
                 OutlinedTextField(
                     value = cardHolder,
                     onValueChange = { cardHolder = it },
-                    label = { Text("Card Holder's Name", color = Color.White) }, // White placeholder text
+                    label = { Text("Card Holder's Name", color = Color.White) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedLabelColor = Color(0xFFEB001B), // Mastercard red for focused placeholder
-                        unfocusedLabelColor = Color.White, // White placeholder when unfocused
-                        focusedBorderColor = Color(0xFFEB001B), // Mastercard red for focused border
-                        unfocusedBorderColor = Color.Gray, // Gray border when unfocused
-                        cursorColor = Color.White // White cursor
+                        focusedLabelColor = Color(0xFFEB001B),
+                        unfocusedLabelColor = Color.White,
+                        focusedBorderColor = Color(0xFFEB001B),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color.White
                     ),
-                    textStyle = TextStyle(color = Color.White), // White text color
-                    placeholder = { Text("Card Holder's Name", color = Color.White) } // White placeholder text
+                    textStyle = TextStyle(color = Color.White)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -2776,6 +2838,7 @@ fun MastercardPaymentPage(
         }
     }
 }
+
 
 @Preview( showBackground = true)
 @Composable

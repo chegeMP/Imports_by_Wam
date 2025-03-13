@@ -59,6 +59,12 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
 
 
+
+
+    implementation ("androidx.room:room-runtime:2.6.1")
+
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
