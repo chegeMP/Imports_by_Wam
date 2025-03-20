@@ -106,6 +106,22 @@ import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 
 
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.example.importsbywam.model.User
+import com.example.importsbywam.network.RetrofitClient
+import com.example.importsbywam.viewmodel.UserViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,6 +187,8 @@ fun MyAppNavigation() {
         composable("trackorder") { OrderTrackingScreen(navController, currentStep = 1) }
         composable("paymentplan") { PaymentPlanPage(navController) }
         composable("confirmation") { ConfirmationPage(navController) }
+        composable("userlist") { UserListScreen(navController) }
+
     }
 }
 
@@ -3604,4 +3622,55 @@ fun ReportsScreen(navController: NavController) {
 fun ReportsScreenPreview() {
     val navController = rememberNavController()
     ReportsScreen(navController)
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserListScreen(navController: NavHostController, userViewModel: UserViewModel = viewModel())
+{
+    val users by userViewModel.users.collectAsState()
+
+    // Trigger fetch on screen launch
+    LaunchedEffect(Unit) {
+        userViewModel.fetchUsers()
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Users List") })
+        }
+    ) { padding ->
+        LazyColumn(
+            contentPadding = padding,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(users) { user ->
+                UserItem(user)
+            }
+        }
+    }
+}
+
+@Composable
+fun UserItem(user: User) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "Name: ${user.name}")
+            Text(text = "Email: ${user.email}")
+            Text(text = "Phone: ${user.phone}")
+            Text(text = "Type: ${user.user_type}")
+        }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun UserListScreenPreview() {
+    val navController = rememberNavController()
+    UserListScreen(navController = navController)
 }

@@ -58,10 +58,23 @@ dependencies {
     implementation ("androidx.activity:activity-compose:1.8.0")
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+    //  Retrofit for API calls
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+
+//  Gson Converter for JSON parsing
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+//  For easy logging of network calls
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+
 
 
 
     implementation ("androidx.room:room-runtime:2.6.1")
+    implementation(libs.androidx.appcompat)
+   // implementation(project(":app"))
+    //implementation(project(":app"))
 
 
 
