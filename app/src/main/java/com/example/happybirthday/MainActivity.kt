@@ -1,9 +1,14 @@
 package com.example.happybirthday
-
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,89 +33,77 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
-import coil.compose.AsyncImage
-
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.happybirthday.R.drawable.teaser_1
-import com.example.happybirthday.ui.theme.HappyBirthdayTheme
-import coil.compose.rememberImagePainter
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.AlertDialog
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil.compose.AsyncImage
 
 
 class MainActivity : ComponentActivity() {
@@ -247,86 +240,7 @@ val navController = rememberNavController()
 
 }
 
-@Composable
-fun ReUseTextField(
-    label: String,
-    textValue: String,
-    onTextChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = textValue,
-        onValueChange = onTextChange,
-        singleLine = true,
-        label = { Text(label) },
-        textStyle = TextStyle(
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Yellow
-        ),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.Yellow,
-            unfocusedTextColor = Color.Yellow,
-            cursorColor = Color.Yellow,
-            focusedContainerColor = Color.Black,
-            unfocusedContainerColor = Color.Black,
-            focusedBorderColor = Color.Yellow,
-            unfocusedBorderColor = Color.Gray
-        ),
-        shape = RoundedCornerShape(20.dp),
-        modifier = modifier
-            .width(300.dp)
-            .height(50.dp)
-    )
-}
 
-// Preview of the Reusable Text Field
-@Preview(showBackground = true)
-@Composable
-fun ReUseTextFieldPreview() {
-    var text by remember { mutableStateOf("") }
-
-    ReUseTextField(
-        label = "Enter Name",
-        textValue = text,
-        onTextChange = { text = it }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TextPreview() {
-    Text(
-        text = "How are you??",
-        color = Color.Red,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        modifier = Modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FilledButtonPreview() {
-    FilledButton(title = "Sad", buttonWidth = 300, buttonHeight = 50)
-}
-
-
-@Composable
-fun FilledButton(
-    title: String,
-    buttonWidth: Int,
-    buttonHeight: Int,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = { /*TODO*/ },
-        colors = ButtonDefaults.buttonColors(Color.Black),
-        modifier = modifier
-    ) {
-        Text(text = title, color = White, fontWeight = FontWeight.SemiBold, fontSize = 24.sp)
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -566,11 +480,6 @@ fun SocialLoginButton(iconRes: Int) {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun No() {
-    FilledButton(title = "No", buttonWidth = 300, buttonHeight = 50)
-}
 
 @Composable
 fun ReUseImage(painter: Painter) {
@@ -853,11 +762,17 @@ fun PaymentOptionsScreenPreview() {
     val navController = rememberNavController()
     PaymentOptionsScreen( navController = navController,onBackClick = {} )
 }
+
+
 @Composable
 fun CarListingScreen(navController: NavController, modifier: Modifier = Modifier) {
     var searchQuery by remember { mutableStateOf("") } // Holds the search input
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF121212))) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF121212))
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -900,7 +815,7 @@ fun CarListingScreen(navController: NavController, modifier: Modifier = Modifier
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Single Search Bar
+            // Search Bar
             SearchBar(
                 query = searchQuery,
                 onQueryChange = { searchQuery = it },
@@ -911,19 +826,21 @@ fun CarListingScreen(navController: NavController, modifier: Modifier = Modifier
 
             // Filtered Car List
             val filteredCars = carList.filter { car ->
-                // Check if any of the car's properties match the search query
                 listOf(
                     car.name,
                     car.price,
                     car.fuelType,
                     car.location,
                     car.mileage
-                ).any { it.contains(searchQuery, ignoreCase = true) }
+                ).any { it.contains(searchQuery.trim(), ignoreCase = true) }
             }
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
                 items(filteredCars) { car ->
-                    CarCard(car = car, navController = navController) // Pass navController
+                    CarCard(car = car, navController = navController)
                 }
             }
         }
@@ -936,35 +853,36 @@ fun SearchBar(
     onQueryChange: (String) -> Unit,
     placeholder: String
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFD3D3D3), shape = RoundedCornerShape(25.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = "Search",
-            tint = Color.Black,
-            modifier = Modifier.size(24.dp)
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+                tint = Color.Black,
+                modifier = Modifier.size(24.dp)
+            )
 
-        Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
-        TextField(
-            value = query,
-            onValueChange = onQueryChange,
-            placeholder = { Text(placeholder) },
-            modifier = Modifier.weight(1f),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent
-            ),
-            singleLine = true
-        )
+            TextField(
+                value = query,
+                onValueChange = onQueryChange,
+                placeholder = { Text(placeholder) },
+                modifier = Modifier.weight(1f),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
+                ),
+                singleLine = true
+            )
+        }
     }
 }
 
@@ -975,8 +893,8 @@ fun CarCard(car: Car, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .height(300.dp)
-            .clickable { // Add clickable modifier
-                navController.navigate("cardetailscreen/${car.name}") // Pass car name as argument
+            .clickable {
+                navController.navigate("cardetailscreen/${Uri.encode(car.name)}") // Encode the name
             },
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
@@ -1010,26 +928,10 @@ fun CarCard(car: Car, navController: NavController) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Year of Manufacture: ${car.year}",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "Current Location: ${car.location}",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "Drive: ${car.drive}",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "Mileage: ${car.mileage}",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
+                Text("Year of Manufacture: ${car.year}", color = Color.Gray, fontSize = 14.sp)
+                Text("Current Location: ${car.location}", color = Color.Gray, fontSize = 14.sp)
+                Text("Drive: ${car.drive}", color = Color.Gray, fontSize = 14.sp)
+                Text("Mileage: ${car.mileage}", color = Color.Gray, fontSize = 14.sp)
                 Text(
                     text = "Availability: ${car.availability}",
                     color = if (car.availability == "Available") Color.Green else Color.Red,
@@ -1043,11 +945,7 @@ fun CarCard(car: Car, navController: NavController) {
                     .background(Color(0xFFFFAF00), shape = RoundedCornerShape(8.dp))
                     .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
-                Text(
-                    text = "Ksh ${car.price}",
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold
-                )
+                Text(text = "Ksh ${car.price}", color = Color.Black, fontWeight = FontWeight.Bold)
             }
             Button(
                 onClick = { /* TODO: Handle purchase */ },
@@ -1055,7 +953,7 @@ fun CarCard(car: Car, navController: NavController) {
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp),
-                enabled = car.availability == "Available" // Disable if not available
+                enabled = car.availability == "Available"
             ) {
                 Text(text = "Purchase", color = Color.Black)
             }
@@ -1063,6 +961,7 @@ fun CarCard(car: Car, navController: NavController) {
     }
 }
 
+// Data Model
 data class Car(
     val name: String,
     val year: String,
@@ -1070,86 +969,18 @@ data class Car(
     val drive: String,
     val mileage: String,
     val price: String,
-    val fuelType: String, // Add fuel type
+    val fuelType: String,
     val imageRes: Int,
     val imageGallery: List<Int> = listOf(),
     val availability: String
 )
 
+// Sample Car Data
 val carList = listOf(
-    Car(
-        name = "Toyota RAV4",
-        year = "2008",
-        location = "Japan",
-        drive = "4WD",
-        mileage = "208,425km",
-        price = "4,746,377",
-        fuelType = "Petrol",
-        imageRes = R.drawable.rav4,
-        imageGallery = listOf(R.drawable.rav4, R.drawable.rav4_side, R.drawable.rav4_back, R.drawable.rav4_inside_f, R.drawable.rav4_inside_r, R.drawable.rav4_trunk, R.drawable.rav4_dash),
-        availability = "Available"
-    ),
-    Car(
-        name = "2019 McLaren 720s",
-        year = "2019",
-        location = "UK",
-        drive = "RWD",
-        mileage = "5,000km",
-        price = "28,000,000",
-        fuelType = "Petrol",
-        imageRes = R.drawable.mclaren,
-        imageGallery = listOf(R.drawable.mclaren, R.drawable.mclaren_side, R.drawable.mclaren_rear),
-        availability = "Sold Out"
-    ),
-    Car(
-        name = "2017 Audi A5",
-        year = "2017",
-        location = "Germany",
-        drive = "AWD",
-        mileage = "60,000km",
-        price = "3,500,000",
-        fuelType = "Diesel",
-        imageRes = R.drawable.audi,
-        imageGallery = listOf(R.drawable.audi, R.drawable.audi_front, R.drawable.audi_back),
-        availability = "Available"
-    ),
-    Car(
-        name = "2018 Mercedes-Benz AMG-GT",
-        year = "2018",
-        location = "Germany",
-        drive = "RWD",
-        mileage = "35,000km",
-        price = "25,000,000",
-        fuelType = "Petrol",
-        imageRes = R.drawable.mercedes,
-        imageGallery = listOf(R.drawable.mercedes, R.drawable.mercedes_side, R.drawable.mercedes_back),
-        availability = "Sold Out"
-    ),
-    // Add Mercedes-Benz GLE350D here
-    Car(
-        name = "Mercedes-Benz GLE350D",
-        year = "2020",
-        location = "Germany",
-        drive = "AWD",
-        mileage = "30,000km",
-        price = "15,000,000",
-        fuelType = "Diesel",
-        imageRes = R.drawable.gle350d, // Ensure you have this drawable resource
-        imageGallery = listOf(R.drawable.gle350d, R.drawable.gle350_ff, R.drawable.gle350d_f,R.drawable.gle350d_r,R.drawable.gle350_if,R.drawable.gle350d_ir),
-        availability = "Available"
-    ),
-    Car(
-        name = "Nissan Patrol",
-        year = "2024",
-        location = "Dubai",
-        drive = "4WD",
-        mileage = "22,000km",
-        price = "10,353,423",
-        fuelType = "Diesel",
-        imageRes = R.drawable.patrol_f, // Ensure you have this drawable resource
-        imageGallery = listOf(R.drawable.patrol_ff, R.drawable.patrol_f, R.drawable.patrol_side,R.drawable.patrol_r,R.drawable.patrol_if),
-        availability = "Available"
-    )
+    Car("Toyota RAV4", "2008", "Japan", "4WD", "208,425km", "4,746,377", "Petrol", R.drawable.rav4, listOf(R.drawable.rav4_side, R.drawable.rav4_back), "Available"),
+    Car("2019 McLaren 720s", "2019", "UK", "RWD", "5,000km", "28,000,000", "Petrol", R.drawable.mclaren, listOf(R.drawable.mclaren_side, R.drawable.mclaren_rear), "Sold Out"),
+    Car("2017 Audi A5", "2017", "Germany", "AWD", "60,000km", "3,500,000", "Diesel", R.drawable.audi, listOf(R.drawable.audi_front, R.drawable.audi_back), "Available"),
+    Car("Mercedes-Benz GLE350D", "2020", "Germany", "AWD", "30,000km", "15,000,000", "Diesel", R.drawable.gle350d, listOf(R.drawable.gle350_ff, R.drawable.gle350d_f), "Available")
 )
 
 
@@ -1168,135 +999,163 @@ fun CarDetailScreenPreview() {
 @Composable
 fun CarDetailScreen(
     car: Car,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    onPurchaseClick: () -> Unit // Add this parameter
+    onPurchaseClick: () -> Unit
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1C1C1C)) // Dark Theme Background
     ) {
-        // Top Navigation with Back Button
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        // Background Image
+        Image(
+            painter = painterResource(id = R.drawable.carpage), // Background Image
+            contentDescription = "Car Background",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+                .matchParentSize()
+                .alpha(0.2f) // Soft transparency for premium feel
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        // Car Image Gallery
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            items(car.imageGallery) { imageRes ->
-                Image(
-                    painter = painterResource(id = imageRes),
-                    contentDescription = car.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(250.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Car Details
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            // Background Image
-            Image(
-                painter = painterResource(id = R.drawable.carpage), // Replace with your actual image
-                contentDescription = "Car Background",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
-                    .alpha(0.2f) // Semi-transparent background
-            )
-
-            // Card on top of the background
-            Card(
-                shape = RoundedCornerShape(topStart = 50.dp, topEnd = 32.dp),
+            // 🔙 Back Button
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp),
-                colors = CardDefaults.cardColors(Color(0x802C2C2C)) // Semi-transparent background
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = car.name,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE4C300)
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
                     )
-                    Text(
-                        text = "Ksh ${car.price}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE4C300)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            // 🚗 Car Image Gallery (Scroll Horizontally)
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                items(car.imageGallery) { imageRes ->
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = car.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(280.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(2.dp, Color(0xFFE4C300), RoundedCornerShape(12.dp)) // Golden Border
                     )
+                }
+            }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = "Vehicle Details",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White)
+            // 📋 Car Details Card
+            Card(
+                shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp),
+                colors = CardDefaults.cardColors(Color(0xCC2C2C2C)), // Dark Semi-Transparent
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        // 🏷 Car Name
+                        Text(
+                            text = car.name,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFE4C300)
+                        )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        // 💰 Price
+                        Text(
+                            text = "Ksh ${car.price}",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFE4C300)
+                        )
 
-                    // Details List
-                    val details = listOf(
-                        "Year of Manufacture" to car.year,
-                        "Current Location" to car.location,
-                        "Availability" to car.availability,
-                        "Drive" to car.drive,
-                        "Mileage" to car.mileage
-                    )
-                    details.forEach { (title, value) ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = title, color = Color.White)
-                            Text(text = value, color = Color.White)
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // 📜 Section Title
+                        Text(
+                            text = "Vehicle Details",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // 📌 Car Details List
+                        val details = listOf(
+                            "Year of Manufacture" to car.year,
+                            "Current Location" to car.location,
+                            "Availability" to car.availability,
+                            "Drive" to car.drive,
+                            "Mileage" to car.mileage
+                        )
+
+                        details.forEach { (title, value) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = title,
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = value,
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                    // Purchase Button
+                    // 🛒 Purchase Button
                     Button(
-                        onClick = onPurchaseClick, // Use the onPurchaseClick parameter
-                        colors = ButtonDefaults.buttonColors(Color(0xFFE4C300)),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        onClick = onPurchaseClick,
+                        colors = ButtonDefaults.buttonColors(Color(0xFFFFAF00)),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(55.dp) // Matches previous button styles
                     ) {
-                        Text(text = "Purchase", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Purchase",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
                     }
                 }
             }
         }
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1317,13 +1176,11 @@ fun VisaPaymentPage(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(Color(0xFF162F44), Color.Gray),
-                    tileMode = TileMode.Clamp,
+                    tileMode = TileMode.Clamp
                 )
             )
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             // Back Button
             Row(
                 modifier = Modifier
@@ -1349,38 +1206,29 @@ fun VisaPaymentPage(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
                     modifier = Modifier
-                        .fillMaxWidth(0.85f)
+                        .fillMaxWidth(0.9f)
                         .padding(16.dp)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(24.dp)
                     ) {
                         // Visa Logo
                         Image(
                             painter = painterResource(id = R.drawable.visa),
                             contentDescription = "VISA Logo",
                             modifier = Modifier
-                                .height(100.dp)
+                                .height(80.dp)
                                 .padding(bottom = 16.dp)
                                 .fillMaxWidth()
                         )
 
-                        // Card Number Field
-                        OutlinedTextField(
+                        // Card Number
+                        CustomTextField(
                             value = cardNumber,
                             onValueChange = { cardNumber = it },
-                            label = { Text("Card Number", color = Color.White) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedLabelColor = Color.White,
-                                focusedLabelColor = Color(0xFF0A1A2E),
-                                unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color(0xFF0A1A2E),
-                                cursorColor = Color.White
-                            ),
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            singleLine = true
+                            label = "Card Number",
+                            keyboardType = KeyboardType.Number
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -1390,90 +1238,64 @@ fun VisaPaymentPage(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            OutlinedTextField(
+                            CustomTextField(
                                 value = expiryMonth,
                                 onValueChange = { expiryMonth = it },
-                                label = { Text("Month", color = Color.White) },
-                                modifier = Modifier.weight(1f),
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    unfocusedLabelColor = Color.White,
-                                    focusedLabelColor = Color(0xFF0A1A2E),
-                                    unfocusedBorderColor = Color.Gray,
-                                    focusedBorderColor = Color(0xFF0A1A2E),
-                                    cursorColor = Color.White
-                                ),
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                                singleLine = true
+                                label = "Month",
+                                keyboardType = KeyboardType.Number,
+                                modifier = Modifier.weight(1f)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            OutlinedTextField(
+                            Spacer(modifier = Modifier.width(12.dp))
+                            CustomTextField(
                                 value = expiryYear,
                                 onValueChange = { expiryYear = it },
-                                label = { Text("Year", color = Color.White) },
-                                modifier = Modifier.weight(1f),
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    unfocusedLabelColor = Color.White,
-                                    focusedLabelColor = Color(0xFF0A1A2E),
-                                    unfocusedBorderColor = Color.Gray,
-                                    focusedBorderColor = Color(0xFF0A1A2E),
-                                    cursorColor = Color.White
-                                ),
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                                singleLine = true
+                                label = "Year",
+                                keyboardType = KeyboardType.Number,
+                                modifier = Modifier.weight(1f)
                             )
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // CVC Field
-                        OutlinedTextField(
+                        // CVC
+                        CustomTextField(
                             value = cvc,
                             onValueChange = { cvc = it },
-                            label = { Text("CVC", color = Color.White) },
-                            visualTransformation = PasswordVisualTransformation(),
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedLabelColor = Color.White,
-                                focusedLabelColor = Color(0xFF0A1A2E),
-                                unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color(0xFF0A1A2E),
-                                cursorColor = Color.White
-                            ),
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                            singleLine = true
+                            label = "CVC",
+                            keyboardType = KeyboardType.Number,
+                            isPassword = true
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Card Holder's Name Field
-                        OutlinedTextField(
+                        // Card Holder Name
+                        CustomTextField(
                             value = cardHolder,
                             onValueChange = { cardHolder = it },
-                            label = { Text("Card Holder's Name", color = Color.White) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedLabelColor = Color.White,
-                                focusedLabelColor = Color(0xFF0A1A2E),
-                                unfocusedBorderColor = Color.Gray,
-                                focusedBorderColor = Color(0xFF0A1A2E),
-                                cursorColor = Color.White
-                            ),
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                            singleLine = true
+                            label = "Card Holder's Name",
+                            keyboardType = KeyboardType.Text
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
                         // Complete Order Button
                         Button(
                             onClick = {
                                 onCompleteClick()
-                                navController.navigate("confirmation") // Navigate to confirmation page
+                                navController.navigate("confirmation")
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00)),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text(text = "COMPLETE ORDER KSH 4,746,377", color = Color.White)
+                            Text(
+                                text = "COMPLETE ORDER KSH 4,746,377",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -1481,6 +1303,38 @@ fun VisaPaymentPage(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    keyboardType: KeyboardType,
+    isPassword: Boolean = false,
+    modifier: Modifier = Modifier.fillMaxWidth()
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color.White) },
+        modifier = modifier,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            unfocusedLabelColor = Color.White,
+            focusedLabelColor = Color(0xFFFFAF00),
+            unfocusedBorderColor = Color.Gray,
+            focusedBorderColor = Color(0xFFFFAF00),
+            cursorColor = Color.White
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType),
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        singleLine = true
+    )
+}
+
+
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -1935,13 +1789,18 @@ fun ReviewsScreenPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(navController: NavController) {
+    var email by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFF162F44), Color.Gray),
-                tileMode = TileMode.Clamp,
-            ))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF162F44), Color.Gray),
+                    tileMode = TileMode.Clamp,
+                )
+            )
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -1966,43 +1825,65 @@ fun ForgotPasswordScreen(navController: NavController) {
         Text(
             text = "Enter the email registered to your account",
             color = Color.White,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
             text = "We will send you a link to reset your password",
             color = Color.White,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // ✅ Email Input Field (Fix)
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            label = { Text("Enter your email address", color = Color.Gray) },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Enter your email address") },
+            modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(color = Color.White),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFFFAF00),
-                unfocusedBorderColor = Color.Gray
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color(0xFFFFAF00),
+                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
+        // ✅ Error Message (If Email is Empty)
+        if (errorMessage.isNotEmpty()) {
+            Text(text = errorMessage, color = Color.Red, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // ✅ Send Button
         Button(
             onClick = {
-                // Navigate to the Verification Screen
-                navController.navigate("verification")
+                if (email.isEmpty()) {
+                    errorMessage = "Email cannot be empty"
+                } else {
+                    navController.navigate("verification")
+                }
             },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00))
         ) {
-            Text("Send", color = Color.White)
+            Text("Send", fontSize = 18.sp, color = Color.White)
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun ForgotPasswordScreenPreview() {
@@ -2012,14 +1893,16 @@ fun ForgotPasswordScreenPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VerificationScreen(navController: NavController) { // Add NavController parameter
+fun VerificationScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFF162F44), Color.Gray),
-                tileMode = TileMode.Clamp,
-            ))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF162F44), Color.Gray),
+                    tileMode = TileMode.Clamp
+                )
+            )
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -2036,49 +1919,77 @@ fun VerificationScreen(navController: NavController) { // Add NavController para
         Image(
             painter = painterResource(id = R.drawable.happy_user),
             contentDescription = "Happy Avatar",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(120.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Enter the verification code we just sent to your email",
+            text = "Enter the verification code we sent to your email",
             color = Color.White,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
+        // OTP Code Input Fields
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
         ) {
             repeat(4) {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
-                    modifier = Modifier.width(50.dp),
-                    textStyle = TextStyle(textAlign = TextAlign.Center, color = Color.White),
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(60.dp),
+                    textStyle = TextStyle(
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    singleLine = true,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         focusedBorderColor = Color(0xFFFFAF00),
-                        unfocusedBorderColor = Color.Gray
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color.White
                     )
                 )
+                Spacer(modifier = Modifier.width(12.dp))
             }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Verify Button
+        Button(
+            onClick = { navController.navigate("changepassword") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00))
+        ) {
+            Text("Verify", fontSize = 18.sp, color = Color.White, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                // Navigate to the Change Password Screen
-                navController.navigate("changepassword")
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00))
-        ) {
-            Text("Verify", color = Color.White)
-        }
+        // Resend Code Text
+        Text(
+            text = "Didn't receive a code? Resend",
+            color = Color(0xFFFFAF00),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.clickable { /* Handle resend action */ }
+        )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun VerificationScreenPreview() {
@@ -2667,68 +2578,115 @@ fun EditProfileScreenPreview() {
 
 
 @Composable
-fun PaymentPlanPage(navController: NavController) { // Add NavController as a parameter
+fun PaymentPlanPage(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFF162F44), Color.Gray),
-                tileMode = TileMode.Clamp,
-            )),
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF0F172A), Color(0xFF1E293B)), // Deep blue gradient
+                    tileMode = TileMode.Clamp
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
         Card(
-            shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+            shape = RoundedCornerShape(16.dp), // More rounded corners for a modern feel
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2D3748)), // Darker card for contrast
+            elevation = CardDefaults.cardElevation(8.dp),
             modifier = Modifier
-                .fillMaxWidth(0.85f)
+                .fillMaxWidth(0.9f)
                 .padding(16.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(20.dp)
             ) {
+                // Header
                 Text(
                     text = "Payment Plan",
                     color = Color.White,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontSize = 24.sp,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                PaymentSection(title = "Payment Methods", content = "- Mobile Money (M-Pesa, Airtel Money)\n- Bank Transfers\n- Credit/Debit Cards (Visa, Mastercard, AMEX)\n- Cryptocurrency (Optional)")
-                PaymentSection(title = "Installment Plan", content = "- Initial Deposit: 30% (Reserves the car)\n- Second Installment: 40% (After shipping confirmation)\n- Final Payment: 30% (Upon arrival for vehicle release)")
-                PaymentSection(title = "Transaction Costs & Fees", content = "- Processing Fees: 1.5% for card payments\n- M-Pesa Transaction Fee: Ksh. 150 per transaction\n- Bank Transfer Fee: As per bank charges")
-                PaymentSection(title = "Security & Verification", content = "- Secure Payment Gateway with SSL encryption\n- OTP Verification for secure transactions\n- E-Receipts & Confirmation Emails")
-                PaymentSection(title = "Refund & Cancellation Policy", content = "- Full refund if cancellation occurs before shipping\n- 20% deduction for cancellations after shipping\n- No refund once the vehicle is registered")
-                Spacer(modifier = Modifier.height(16.dp))
+
+                // Payment Sections
+                PaymentSection(title = "💳 Payment Methods", content = """
+                    - Mobile Money (M-Pesa, Airtel Money)
+                    - Bank Transfers
+                    - Credit/Debit Cards (Visa, Mastercard, AMEX)
+                    - Cryptocurrency (Optional)
+                """.trimIndent())
+
+                PaymentSection(title = "📅 Installment Plan", content = """
+                    - Initial Deposit: 30% (Reserves the car)
+                    - Second Installment: 40% (After shipping confirmation)
+                    - Final Payment: 30% (Upon arrival for vehicle release)
+                """.trimIndent())
+
+                PaymentSection(title = "💰 Transaction Costs & Fees", content = """
+                    - Processing Fees: 1.5% for card payments
+                    - M-Pesa Transaction Fee: Ksh. 150 per transaction
+                    - Bank Transfer Fee: As per bank charges
+                """.trimIndent())
+
+                PaymentSection(title = "🔒 Security & Verification", content = """
+                    - Secure Payment Gateway with SSL encryption
+                    - OTP Verification for secure transactions
+                    - E-Receipts & Confirmation Emails
+                """.trimIndent())
+
+                PaymentSection(title = "📜 Refund & Cancellation Policy", content = """
+                    - Full refund if cancellation occurs before shipping
+                    - 20% deduction for cancellations after shipping
+                    - No refund once the vehicle is registered
+                """.trimIndent())
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // "Done" Button
                 Button(
-                    onClick = { navController.navigate("menuscreen") }, // Navigate to MenuScreen
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
-                    modifier = Modifier.fillMaxWidth())
-                {
-                    Text(text = "Done", color = Color.Black)
+                    onClick = { navController.navigate("menuscreen") },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)), // Orange for contrast
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(56.dp)
+                ) {
+                    Text(
+                        text = "Done",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
                 }
             }
         }
     }
 }
+
 @Composable
 fun PaymentSection(title: String, content: String) {
-    Column(modifier = Modifier.padding(bottom = 8.dp)) {
+    Column(modifier = Modifier.padding(bottom = 12.dp)) {
         Text(
             text = title,
-            color = Color.Yellow,
-            style = MaterialTheme.typography.titleMedium,
-            fontSize = 18.sp
+            color = Color(0xFFFFD700), // Gold for headers
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 4.dp)
         )
         Text(
             text = content,
             color = Color.White,
             fontSize = 14.sp,
-            modifier = Modifier.padding(top = 4.dp)
+            lineHeight = 20.sp, // Better readability
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }
+
 @Preview( showBackground = true)
 @Composable
 fun PaymentPlanPagePreview() {
@@ -2892,10 +2850,13 @@ fun MastercardPaymentPage(
                 Button(
                     onClick = {
                         onCompleteClick()
-                        navController.navigate("confirmation") // Navigate to confirmation page
+                        navController.navigate("confirmation")
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)), // Mastercard red
-                    modifier = Modifier.fillMaxWidth()
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFAF00)), // Same as Visa
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp), // 50dp height
+                    shape = RoundedCornerShape(8.dp) // 8dp rounded corners
                 ) {
                     Text(text = "COMPLETE ORDER KSH 4,746,377", color = Color.White)
                 }
@@ -2917,18 +2878,22 @@ fun MastercardPaymentPagePreview() {
 
 @Composable
 fun OtpVerificationPage(
-    email: String = "user@example.com", // ✅ Explicit type annotation
-    onOtpVerified: () -> Unit = {}, // ✅ Explicit type annotation
-    onResendOtp: () -> Unit = {} // ✅ Explicit type annotation
+    email: String = "user@example.com",
+    onOtpVerified: () -> Unit = {},
+    onResendOtp: () -> Unit = {}
 ) {
     var otp by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()
-        .background(brush = Brush.verticalGradient(
-            colors = listOf(Color(0xFF162F44), Color.Gray),
-            tileMode = TileMode.Clamp,
-        )), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF162F44), Color.Gray),
+                tileMode = TileMode.Clamp
+            )),
+        contentAlignment = Alignment.Center
+    ) {
         Column(
             modifier = Modifier
                 .width(320.dp)
@@ -2951,25 +2916,34 @@ fun OtpVerificationPage(
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // OTP Input Field
+            // ✅ Fixed OTP Input Field (Material 3)
             OutlinedTextField(
                 value = otp,
                 onValueChange = { otp = it },
-                label = { Text("Enter OTP") },
+                label = { Text("Enter OTP", color = Color.White) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color(0xFFFFA500), // Orange border when focused
+                    unfocusedIndicatorColor = Color.Gray, // Gray border when not focused
+                    cursorColor = Color(0xFFFFA500), // Orange cursor
+                    focusedTextColor = Color.White, // White text color
+                    unfocusedTextColor = Color.White, // Keep text visible
+                    disabledTextColor = Color.Gray, // Disabled state
+                    errorIndicatorColor = Color.Red // Red border if there's an error
+                )
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Error message (if OTP is incorrect)
+            // ✅ Error Message (Only If Incorrect OTP)
             if (errorMessage.isNotEmpty()) {
                 Text(text = errorMessage, color = Color.Red, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Verify OTP Button
+            // ✅ Verify OTP Button (Improved UI)
             Button(
                 onClick = {
                     if (otp == "123456") { // Replace with backend validation
@@ -2981,6 +2955,7 @@ fun OtpVerificationPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
+                shape = RoundedCornerShape(12.dp), // Rounded edges for better UI
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA726))
             ) {
                 Text(text = "Verify OTP", fontSize = 18.sp, color = Color.White)
@@ -2988,13 +2963,15 @@ fun OtpVerificationPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Resend OTP Button
+            // ✅ Resend OTP Button (Subtle UI)
             TextButton(onClick = onResendOtp) {
-                Text(text = "Resend OTP", color = Color.Blue, fontSize = 16.sp)
+                Text(text = "Resend OTP", color = Color.Cyan, fontSize = 16.sp)
             }
         }
     }
 }
+
+
 
 @Preview( showBackground = true)
 @Composable
@@ -3010,6 +2987,7 @@ fun OtpVerificationPagePreview() {
 fun ChangePasswordScreen(navController: NavController) {
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -3041,52 +3019,59 @@ fun ChangePasswordScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // New Password Input Field
+        // ✅ New Password Input Field
         OutlinedTextField(
             value = newPassword,
             onValueChange = { newPassword = it },
-            label = { Text("New Password", color = Color.Gray) },
+            label = { Text("New Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             textStyle = TextStyle(color = Color.White),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFFFAF00),
-                unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.White
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color(0xFFFFAF00),
+                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
             )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Confirm New Password Input Field
+        // ✅ Confirm New Password Input Field
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm New Password", color = Color.Gray) },
+            label = { Text("Confirm New Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             textStyle = TextStyle(color = Color.White),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color(0xFFFFAF00),
-                unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.White
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color(0xFFFFAF00),
+                unfocusedIndicatorColor = Color.Gray,
+                cursorColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Submit Button
+        // ✅ Error Message (If Passwords Don't Match)
+        if (errorMessage.isNotEmpty()) {
+            Text(text = errorMessage, color = Color.Red, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // ✅ Submit Button
         Button(
             onClick = {
-                // Handle password change logic
                 if (newPassword == confirmPassword) {
-                    // Passwords match, proceed with password change
-                    // Example: Call an API or update local state
-                    navController.navigate("login") { // Navigate back to login after successful change
+                    navController.navigate("login") {
                         popUpTo("login") { inclusive = true }
                     }
                 } else {
-                    // Show an error message (e.g., using a Snackbar or Toast)
+                    errorMessage = "Passwords do not match. Please try again."
                 }
             },
             modifier = Modifier
@@ -3099,6 +3084,7 @@ fun ChangePasswordScreen(navController: NavController) {
         }
     }
 }
+
 @Preview( showBackground = true)
 @Composable
 fun ChangePasswordScreenPreview() {
@@ -3268,4 +3254,354 @@ fun TransferInputField(value: String, onValueChange: (String) -> Unit, label: St
 fun BankTransferScreenPreview(){
     val navController = rememberNavController()
     BankTransferScreen(navController = navController)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@Composable
+fun AdminPanelScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF162F44), Color.Gray)
+                )
+            )
+            .padding(16.dp)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Imports by Wam - Admin",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFFFA500),
+                modifier = Modifier.padding(vertical = 20.dp)
+            )
+
+            // Modern Admin Cards Grid
+            AdminActionGrid()
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Button(
+                onClick = { /* Logout action */ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
+                shape = RoundedCornerShape(15.dp),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(50.dp)
+            ) {
+                Text("Logout", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminActionGrid() {
+    val actions = listOf(
+        AdminAction("Manage Imports", Icons.Default.Edit),
+        AdminAction("Manage Users", Icons.Default.Face),
+        AdminAction("View Orders", Icons.Default.List),
+        AdminAction("Add New Car", Icons.Default.AddCircle),
+        AdminAction("Reports", Icons.Default.CheckCircle),
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        actions.chunked(2).forEach { rowItems ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                rowItems.forEach { action ->
+                    AdminCard(action.title, action.icon)
+                }
+                if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+data class AdminAction(val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
+
+@Composable
+fun AdminCard(title: String, icon: ImageVector) {
+    Card(
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.5f)),
+        elevation = CardDefaults.cardElevation(8.dp),
+        modifier = Modifier
+            .height(120.dp)
+            .clickable { /* TODO: Add navigation or action */ }
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                icon,
+                contentDescription = title,
+                tint = Color(0xFFFFA500),
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = title,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AdminPanelScreenPreview() {
+    AdminPanelScreen()
+}
+
+
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddCarScreen() {
+    var model by remember { mutableStateOf("") }
+    var mileage by remember { mutableStateOf("") }
+    var fuelType by remember { mutableStateOf("Petrol") }
+    var price by remember { mutableStateOf("") }
+    var isAvailable by remember { mutableStateOf(true) }
+    val fuelOptions = listOf("Petrol", "Diesel", "Electric", "Hybrid")
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF162F44), Color.Gray)
+                )
+            )
+            .padding(16.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "Add New Car",
+                color = Color(0xFFFFA500),
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Image Upload (Simulated)
+            Box(
+                modifier = Modifier
+                    .size(150.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color.DarkGray.copy(alpha = 0.5f))
+                    .clickable { /* TODO: Image Picker */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.AddCircle, contentDescription = "Upload Image", tint = Color(0xFFFFA500), modifier = Modifier.size(50.dp))
+            }
+            Text("Tap to Upload Car Image", color = Color.White, fontSize = 14.sp)
+
+            CustomTextField(label = "Car Model", value = model) { model = it }
+            CustomTextField(label = "Mileage (KM)", value = mileage) { mileage = it }
+            CustomTextField(label = "Price (Ksh)", value = price) { price = it }
+
+            // Fuel Type Dropdown
+            var expanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                TextField(
+                    value = fuelType,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Fuel Type", color = Color.White) },
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.DarkGray.copy(alpha = 0.5f),
+                        focusedIndicatorColor = Color(0xFFFFA500),
+                        unfocusedIndicatorColor = Color.Gray,
+                        cursorColor = Color.White,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.Gray
+                    ),
+                    trailingIcon = {
+                        Icon(Icons.Filled.ArrowDropDown, contentDescription = "Dropdown", tint = Color.White)
+                    },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    fuelOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                fuelType = option
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Availability Switch
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Available?", color = Color.White, fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(16.dp))
+                Switch(checked = isAvailable, onCheckedChange = { isAvailable = it }, colors = SwitchDefaults.colors(checkedThumbColor = Color(0xFFFFA500)))
+            }
+
+            // Submit Button
+            Button(
+                onClick = { /* Submit logic */ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
+                shape = RoundedCornerShape(15.dp),
+                modifier = Modifier.fillMaxWidth(0.8f)
+            ) {
+                Text("Add Car", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTextField(label: String, value: String, onValueChange: (String) -> Unit) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color.White) },
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.DarkGray.copy(alpha = 0.5f),
+            focusedIndicatorColor = Color(0xFFFFA500),
+            unfocusedIndicatorColor = Color.Gray,
+            cursorColor = Color.White,
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            disabledTextColor = Color.Gray
+        )
+    ,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+@Preview(showBackground = true )
+@Composable()
+    fun AddCarScreenPreview(){
+        AddCarScreen()
+}
+
+
+
+
+
+data class Report(val title: String, val description: String, val date: String)
+@Composable
+fun ReportCard(report: Report) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.4f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(report.title, color = Color(0xFFFFA500), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(report.description, color = Color.White, fontSize = 16.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(report.date, color = Color.Gray, fontSize = 14.sp)
+        }
+    }
+}
+
+@Composable
+fun ReportsScreen(navController: NavController) {
+    val sampleReports = listOf(
+        Report("Total Cars Imported", "50 cars imported in March", "20 Mar 2025"),
+        Report("Pending Orders", "5 orders pending approval", "20 Mar 2025"),
+        Report("Completed Orders", "45 orders completed", "19 Mar 2025"),
+        Report("Revenue Report", "Total revenue: \$250,000", "18 Mar 2025"),
+        Report("Top Car Model", "Toyota Harrier leads with 15 imports", "17 Mar 2025")
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFF162F44), Color.Gray),
+                    tileMode = TileMode.Clamp,
+                )
+            )
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Back Button & Title
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = "Reports",
+                    color = Color(0xFFFFA500),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Scrollable Report List
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(sampleReports) { report ->
+                    ReportCard(report)
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ReportsScreenPreview() {
+    val navController = rememberNavController()
+    ReportsScreen(navController)
 }
