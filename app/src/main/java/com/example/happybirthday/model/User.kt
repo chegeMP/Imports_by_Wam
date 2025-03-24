@@ -1,7 +1,7 @@
 package com.example.importsbywam.model
 
 data class User(
-    val user_id: Int,
+    val user_id: Int? = null,
     val name: String,
     val email: String,
     val phone: String,

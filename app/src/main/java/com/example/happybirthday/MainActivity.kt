@@ -107,15 +107,29 @@ import coil.compose.AsyncImage
 
 
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.importsbywam.model.RegisterRequest
 import com.example.importsbywam.model.User
 import com.example.importsbywam.network.RetrofitClient
 import com.example.importsbywam.viewmodel.UserViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -137,7 +151,7 @@ fun MyAppNavigation() {
 
     NavHost(navController = navController, startDestination = "teaser") {
         composable("teaser") { TeazerPage(navController) }
-        composable("signup") { SignUpImage(navController) }
+        composable("signup") { SignUpImage(navController, UserViewModel()) }
         composable("login") { LogInImage(navController) }
         composable("carlistingscreen") { CarListingScreen(navController) }
         composable("menuscreen") { MenuScreen(navController) }
@@ -264,7 +278,7 @@ val navController = rememberNavController()
 @Composable
 fun SignUpImagePreview() {
 val navController = rememberNavController()
-    SignUpImage( modifier = Modifier, navController = navController)
+    SignUpImage( modifier = Modifier,navController = navController, userViewModel = UserViewModel())
 }
 
 
@@ -381,8 +395,23 @@ fun PageImagePreview() {
 }
 
 @Composable
-fun SignUpImage(navController: NavController, modifier: Modifier = Modifier) {
+fun SignUpImage(navController: NavController, userViewModel: UserViewModel, modifier: Modifier = Modifier) {
     val image = painterResource(id = R.drawable.signup)
+    val context = LocalContext.current
+
+    // State for inputs
+    var name by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
+    // Observing loading, error, and success states from ViewModel
+    val isLoading by userViewModel.isLoading.collectAsState()
+    val error by userViewModel.error.collectAsState()
+    val success by userViewModel.registerSuccess.collectAsState()
+
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -395,7 +424,7 @@ fun SignUpImage(navController: NavController, modifier: Modifier = Modifier) {
         Card(
             modifier = Modifier
                 .width(361.dp)
-                .height(550.dp) // Increased height to accommodate social buttons
+                .height(650.dp)
                 .align(Alignment.Center),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.7f))
@@ -416,9 +445,25 @@ fun SignUpImage(navController: NavController, modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                var email by remember { mutableStateOf("") }
-                var password by remember { mutableStateOf("") }
-                var confirmPassword by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name", color = Color.White) },
+                    leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text("Phone", color = Color.White) },
+                    leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = "Phone") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
                     value = email,
@@ -452,9 +497,23 @@ fun SignUpImage(navController: NavController, modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                if (isLoading) {
+                    CircularProgressIndicator(color = Color.Yellow)
+                }
+
                 Button(
                     onClick = {
-                        navController.navigate("login")
+                        if (password == confirmPassword) {
+                            val registerRequest = RegisterRequest(
+                                name.trim(),
+                                phone.trim(),
+                                email.trim(),
+                                password.trim()
+                            )
+                            userViewModel.registerUser(registerRequest)
+                        } else {
+                            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -467,6 +526,25 @@ fun SignUpImage(navController: NavController, modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                Spacer(modifier = Modifier.height(10.dp))
+
+                ClickableText(
+                    text = buildAnnotatedString {
+                        append("Already have an account? ")
+                        withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+                            append("Login")
+                        }
+                    },
+                    onClick = {
+                        navController.navigate("login")
+                    },
+                    style = TextStyle(fontSize = 16.sp, color = Color.White)
+                )
+
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+
                 Text(text = "Or Sign up with:", color = Color.White, fontSize = 16.sp)
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -474,7 +552,23 @@ fun SignUpImage(navController: NavController, modifier: Modifier = Modifier) {
                     SocialLoginButton(R.drawable.facebook)
                     SocialLoginButton(R.drawable.instagram)
                     SocialLoginButton(R.drawable.google)
+                }
+            }
+        }
 
+        // Show error if any
+        LaunchedEffect(error) {
+            error?.let {
+                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        //Navigate to login screen after successful signup
+        LaunchedEffect(success) {
+            if (success) {
+                Toast.makeText(context, "Sign up successful!", Toast.LENGTH_SHORT).show()
+                navController.navigate("login") {
+                    popUpTo("signup") { inclusive = true } // Optional: removes signup from back stack
                 }
             }
         }
@@ -490,12 +584,11 @@ fun SocialLoginButton(iconRes: Int) {
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = "Social Login",
-            tint = Color.Unspecified,  // Fixes invisible icons
+            tint = Color.Unspecified,
             modifier = Modifier.size(40.dp)
         )
     }
 }
-
 
 
 
@@ -3668,7 +3761,7 @@ fun UserItem(user: User) {
         }
     }
 }
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun UserListScreenPreview() {
     val navController = rememberNavController()

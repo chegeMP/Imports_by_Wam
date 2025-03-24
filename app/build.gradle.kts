@@ -69,8 +69,6 @@ dependencies {
 
 
 
-
-
     implementation ("androidx.room:room-runtime:2.6.1")
     implementation(libs.androidx.appcompat)
    // implementation(project(":app"))
