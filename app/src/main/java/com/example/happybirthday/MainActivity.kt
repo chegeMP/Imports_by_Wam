@@ -116,6 +116,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -124,6 +125,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.importsbywam.model.RegisterRequest
 import com.example.importsbywam.model.User
+import com.example.importsbywam.network.AuthHelper
 import com.example.importsbywam.network.RetrofitClient
 import com.example.importsbywam.viewmodel.UserViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -612,9 +614,13 @@ fun ReUseImage(painter: Painter) {
 @Composable
 fun LogInImage(navController: NavController, modifier: Modifier = Modifier) {
     val image = painterResource(id = R.drawable.login)
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image
         Image(
             painter = image,
             contentDescription = null,
@@ -622,7 +628,6 @@ fun LogInImage(navController: NavController, modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxSize()
         )
 
-        // Semi-transparent login card
         Card(
             modifier = Modifier
                 .width(320.dp)
@@ -637,19 +642,9 @@ fun LogInImage(navController: NavController, modifier: Modifier = Modifier) {
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "LOGIN",
-                    fontSize = 24.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-
+                Text("LOGIN", fontSize = 24.sp, color = Color.White, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(20.dp))
 
-                var email by remember { mutableStateOf("") }
-                var password by remember { mutableStateOf("") }
-
-                // Email Input Field
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -665,7 +660,6 @@ fun LogInImage(navController: NavController, modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Password Input Field
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -682,11 +676,24 @@ fun LogInImage(navController: NavController, modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Login Button
                 Button(
                     onClick = {
-                        navController.navigate("carlistingscreen") {
-                            popUpTo("login") { inclusive = true }
+                        coroutineScope.launch {
+                            isLoading = true
+                            try {
+                                val response = AuthHelper.loginUser(email, password)
+                                if (response.isSuccessful) {
+                                    navController.navigate("carlistingscreen") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                } else {
+                                    errorMessage = "Invalid Credentials"
+                                }
+                            } catch (e: Exception) {
+                                errorMessage = "Network Error: ${e.localizedMessage}"
+                            } finally {
+                                isLoading = false
+                            }
                         }
                     },
                     modifier = Modifier
@@ -695,48 +702,38 @@ fun LogInImage(navController: NavController, modifier: Modifier = Modifier) {
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA726))
                 ) {
-                    Text(text = "Log In", fontSize = 18.sp, color = Color.White)
+                    Text(text = if (isLoading) "Loading..." else "Log In", fontSize = 18.sp, color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Forgot Password
                 Text(
                     text = "Forgot password? Click here",
                     fontSize = 14.sp,
                     color = Color.White,
-                    modifier = Modifier.clickable {
-                        // Navigate to the Forgot Password Screen
-                        navController.navigate("forgotpassword")
-                    }
+                    modifier = Modifier.clickable { navController.navigate("forgotpassword") }
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
-
-                // Sign In With Text
-                Text(
-                    text = "Or Sign in With:",
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
-
+                Text("Or Sign in With:", fontSize = 14.sp, color = Color.White)
                 Spacer(modifier = Modifier.height(10.dp))
-
-                // Social Media Icons
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
                     SocialIcon(R.drawable.facebook, "Facebook")
                     SocialIcon(R.drawable.instagram, "Instagram")
                     SocialIcon(R.drawable.google, "Google")
+                }
+
+                // Error Message
+                if (errorMessage.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(text = errorMessage, color = Color.Red)
                 }
             }
         }
     }
 }
 
-// Helper function for Social Media Icons
+
 @Composable
 fun SocialIcon(iconRes: Int, contentDesc: String) {
     Image(
@@ -745,6 +742,8 @@ fun SocialIcon(iconRes: Int, contentDesc: String) {
         modifier = Modifier.size(40.dp)
     )
 }
+
+
 
 
 @Preview(showBackground = true)

@@ -1,5 +1,6 @@
 package com.example.importsbywam.network
 
+import com.example.importsbywam.model.LoginRequest
 import com.example.importsbywam.model.User
 import com.example.importsbywam.model.RegisterRequest
 import retrofit2.Response
@@ -15,4 +16,8 @@ interface ApiService {
     // ✅ Add this for fetching users
     @GET("/api/users")
     suspend fun getUsers(): Response<List<User>>
+
+    @POST("/api/auth/login")
+    suspend fun loginUser(@Body loginRequest: LoginRequest): Response<User>
+
 }

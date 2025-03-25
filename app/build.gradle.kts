@@ -67,6 +67,9 @@ dependencies {
 //  For easy logging of network calls
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
+
 
 
     implementation ("androidx.room:room-runtime:2.6.1")
